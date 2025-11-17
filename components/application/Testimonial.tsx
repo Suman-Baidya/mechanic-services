@@ -43,24 +43,30 @@ export default function TestimonialsCarousel() {
   const slides = [...testimonialsData, ...testimonialsData, ...testimonialsData];
   const middleIndex = testimonialsData.length; // Start at middle batch
 
-  const startAutoSlide = () => {
-    stopAutoSlide();
-    intervalRef.current = window.setInterval(() => {
-      setIndex((prev) => prev + 1);
-    }, 3000);
-  };
-
-  const stopAutoSlide = () => {
-    if (intervalRef.current !== null) {
-      window.clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  };
+  // const stopAutoSlide = () => {
+  //   if (intervalRef.current !== null) {
+  //     window.clearInterval(intervalRef.current);
+  //     intervalRef.current = null;
+  //   }
+  // };
 
   // Auto-slide
   useEffect(() => {
-    startAutoSlide();
-    return () => stopAutoSlide();
+    // clear any existing interval
+    if (intervalRef.current !== null) {
+      window.clearInterval(intervalRef.current);
+    }
+
+    intervalRef.current = window.setInterval(() => {
+      setIndex((prev) => prev + 1);
+    }, 3000);
+
+    return () => {
+      if (intervalRef.current !== null) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
   }, []);
 
   // Adjust index on loop
