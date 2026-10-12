@@ -79,7 +79,7 @@ export default function ServicesPage() {
               {service.title}
             </h3>
             {/* Description */}
-            <p className="text-gray-600 mt-3 text-base leading-relaxed">
+            <p className="text-gray-600 mt-3 text-sm truncate" title={service.description}>
               {service.description}
             </p>
 

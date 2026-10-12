@@ -99,7 +99,7 @@ export default function ServicesSection() {
             </h3>
 
             {/* Text */}
-            <p className="text-gray-600 mt-2 relative z-10">{service.text}</p>
+            <p className="text-gray-600 mt-2 relative z-10 text-sm truncate" title={service.text}>{service.text}</p>
 
             {/* Bottom Bar Animation */}
             <motion.span

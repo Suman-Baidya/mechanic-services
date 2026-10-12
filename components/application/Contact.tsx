@@ -25,7 +25,9 @@ export default function ContactBooking() {
     message: "",
   });
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -39,7 +41,7 @@ export default function ContactBooking() {
       {/* Gradient Background */}
       <div className="absolute inset-0 bg-linear-to-br from-rose-50 via-white to-rose-100" />
 
-      {/* Floating Glows — now CSS animated (SSR safe) */}
+      {/* Static floating glow elements */}
       <div className="absolute w-80 h-80 bg-rose-300/30 rounded-full blur-3xl top-10 left-10 animate-float-slow" />
       <div className="absolute w-96 h-96 bg-rose-200/40 rounded-full blur-3xl bottom-0 right-10 animate-float-slower" />
 
@@ -65,10 +67,7 @@ export default function ContactBooking() {
                 key={i}
                 className="flex items-center gap-4 hover:scale-[1.02] transition-transform"
               >
-                <div
-                  className={`p-3 bg-rose-100 text-rose-600 rounded-xl shadow-sm 
-                  animate-float-delay-${i}`}
-                >
+                <div className="p-3 bg-rose-100 text-rose-600 rounded-xl shadow-sm animate-float-slow">
                   {item.icon}
                 </div>
                 <p className="text-lg font-medium text-gray-700">{item.label}</p>
@@ -92,10 +91,9 @@ export default function ContactBooking() {
         {/* RIGHT FORM */}
         <form
           onSubmit={handleSubmit}
-          className="relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-10 border border-rose-200 
-          animate-fade-in-right"
+          className="relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-10 border border-rose-200 animate-fade-in-right"
         >
-          {/* Shimmer border using pure CSS */}
+          {/* Shimmer border */}
           <div className="absolute inset-0 rounded-3xl shimmer-border pointer-events-none" />
 
           <h3 className="text-2xl font-semibold mb-6 text-gray-900">
@@ -112,8 +110,7 @@ export default function ContactBooking() {
                 required
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-300 
-                focus:ring-2 focus:ring-rose-400 outline-none"
+                className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-rose-400 outline-none"
               />
             </div>
 
@@ -126,8 +123,7 @@ export default function ContactBooking() {
                 pattern="^[0-9]{10}$"
                 value={formData.phone}
                 onChange={handleChange}
-                className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-300 
-                focus:ring-2 focus:ring-rose-400 outline-none"
+                className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-rose-400 outline-none"
               />
             </div>
           </div>
@@ -141,8 +137,7 @@ export default function ContactBooking() {
               required
               value={formData.service}
               onChange={handleChange}
-              className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-300 
-              focus:ring-2 focus:ring-rose-400 outline-none"
+              className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-rose-400 outline-none"
             />
           </div>
 
@@ -154,15 +149,13 @@ export default function ContactBooking() {
               name="message"
               value={formData.message}
               onChange={handleChange}
-              className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-300 
-              focus:ring-2 focus:ring-rose-400 outline-none"
+              className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-rose-400 outline-none"
             ></textarea>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-rose-600 text-white py-3 rounded-xl flex items-center justify-center gap-2 
-            text-lg font-semibold shadow-md hover:bg-rose-700 transition"
+            className="w-full bg-rose-600 text-white py-3 rounded-xl flex items-center justify-center gap-2 text-lg font-semibold shadow-md hover:bg-rose-700 transition"
           >
             <Send className="w-5 h-5" /> Submit Request
           </button>

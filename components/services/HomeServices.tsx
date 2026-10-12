@@ -57,7 +57,7 @@ export default function HomeServicesPage() {
       </motion.div>
 
       {/* SERVICES GRID */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
         {HOME_SERVICES.map((service, index) => (
           <motion.div
             key={index}
@@ -65,11 +65,11 @@ export default function HomeServicesPage() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4, delay: index * 0.1 }}
             whileHover={{ scale: 1.03 }}
-            className="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl cursor-pointer border border-gray-100"
+            className="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl cursor-pointer border border-gray-100 flex flex-col h-fit"
           >
-            <service.icon className="w-12 h-12 text-blue-600 mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">{service.title}</h3>
-            <p className="text-gray-600 text-sm">{service.description}</p>
+            <service.icon className="w-12 h-12 text-blue-600 mb-4 shrink-0" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2 truncate" title={service.title}>{service.title}</h3>
+            <p className="text-gray-600 text-sm truncate" title={service.description}>{service.description}</p>
           </motion.div>
         ))}
       </div>

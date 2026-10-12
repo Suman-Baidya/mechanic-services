@@ -46,12 +46,10 @@ const FOOTER_CONTENT = {
   ],
 
   services: [
-    "Engine Repair",
-    "Bike Servicing",
-    "Car Inspection",
-    "Emergency Breakdown",
-    "Battery Replacement",
-    "Oil Change",
+    { name: "Home Services", href: "/services/home" },
+    { name: "Car Services", href: "/services/car" },
+    { name: "Computer Services", href: "/services/computer" },
+    { name: "Electrical & Plumbing", href: "/services/electricalplumbing" },
   ],
 
   contact: {
@@ -153,12 +151,14 @@ export default function Footer() {
 
           <ul className="space-y-2">
             {FOOTER_CONTENT.services.map((srv, i) => (
-              <li
-                key={i}
-                className="group hover:text-rose-400 flex items-center gap-2 transition-all"
-              >
-                <Hammer className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-                {srv}
+              <li key={i}>
+                <Link
+                  href={srv.href}
+                  className="group hover:text-rose-400 flex items-center gap-2 transition-all cursor-pointer"
+                >
+                  <Hammer className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-rose-400" />
+                  <span>{srv.name}</span>
+                </Link>
               </li>
             ))}
           </ul>

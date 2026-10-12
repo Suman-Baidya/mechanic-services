@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Lottie from "lottie-react";
 import supportAnimation from "@/public/lottie/support.json"; // <-- replace with your file
 import { useState } from "react";
+import { Zap, Wrench, PhoneCall, MapPin } from "lucide-react";
 
 // ------------------------------------------
 // 🔵 Editable Content (Easy to Edit / DB Ready)
@@ -14,22 +15,22 @@ const supportData = {
     "Whether you need technical support, repair guidance, or help with your booking — our team is always ready.",
   categories: [
     {
-      icon: "⚡",
+      icon: Zap,
       title: "Quick Support",
       desc: "Instant help for simple queries and troubleshooting.",
     },
     {
-      icon: "🛠️",
+      icon: Wrench,
       title: "Repair Assistance",
       desc: "Guidance and help for your appliance repair requests.",
     },
     {
-      icon: "📞",
+      icon: PhoneCall,
       title: "Call Support",
       desc: "Talk directly with our support experts.",
     },
     {
-      icon: "📍",
+      icon: MapPin,
       title: "Track Service",
       desc: "Know the current status of your ongoing repair.",
     },
@@ -58,8 +59,10 @@ const supportData = {
 // 🔵 Page Component UI
 // ------------------------------------------
 export default function SupportPage() {
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+
   return (
-    <div className="min-h-screen bg-white px-6 md:px-16 lg:px-24 py-16 mt-10">
+    <div className="min-h-screen bg-white px-6 md:px-16 lg:px-24 pt-28 pb-16">
       {/* ------------------------------ */}
       {/* Header */}
       {/* ------------------------------ */}
@@ -80,17 +83,19 @@ export default function SupportPage() {
       {/* ------------------------------ */}
       {/* Support Categories */}
       {/* ------------------------------ */}
-      <div className="grid md:grid-cols-4 gap-6 mt-16">
+      <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6 mt-16">
         {supportData.categories.map((cat, i) => (
           <motion.div
             key={i}
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, y: -4 }}
             transition={{ type: "spring", stiffness: 200 }}
-            className="p-6 rounded-xl border shadow-sm bg-white text-center hover:shadow-lg cursor-pointer hover:shadow-primary/30 transition"
+            className="p-6 rounded-2xl border border-gray-100 shadow-sm bg-white text-center hover:shadow-xl cursor-pointer hover:border-primary/30 transition-all group"
           >
-            <div className="text-5xl mb-3">{cat.icon}</div>
-            <h3 className="text-xl font-semibold">{cat.title}</h3>
-            <p className="text-gray-600 mt-2">{cat.desc}</p>
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm">
+              <cat.icon className="w-8 h-8 transition-transform group-hover:scale-110" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 group-hover:text-primary transition">{cat.title}</h3>
+            <p className="text-gray-600 mt-2 text-sm leading-relaxed">{cat.desc}</p>
           </motion.div>
         ))}
       </div>
@@ -98,7 +103,7 @@ export default function SupportPage() {
       {/* ------------------------------ */}
       {/* Lottie + FAQ Chat Layout */}
       {/* ------------------------------ */}
-      <div className="grid md:grid-cols-2 gap-10 mt-20">
+      <div className="grid md:grid-cols-2 gap-10 mt-20 items-start">
         {/* Left Side – Lottie Animation */}
         <motion.div
           initial={{ opacity: 0, x: -40 }}
@@ -120,9 +125,17 @@ export default function SupportPage() {
             Frequently Asked Questions
           </h2>
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             {supportData.faqs.map((faq, i) => (
-              <FaqChatItem key={i} q={faq.q} a={faq.a} />
+              <FaqChatItem
+                key={i}
+                q={faq.q}
+                a={faq.a}
+                isOpen={openFaqIndex === i}
+                onToggle={() =>
+                  setOpenFaqIndex(openFaqIndex === i ? null : i)
+                }
+              />
             ))}
           </div>
         </div>
@@ -132,40 +145,43 @@ export default function SupportPage() {
 }
 
 // ------------------------------------------
-// 🔵 FAQ Chat Item — Animated Expand/Collapse
+// 🔵 FAQ Chat Item — Single Open Accordion
 // ------------------------------------------
 function FaqChatItem({
   q,
   a,
+  isOpen,
+  onToggle,
 }: {
   q: string;
   a: string;
+  isOpen: boolean;
+  onToggle: () => void;
 }) {
-  const [open, setOpen] = useState(false);
-
   return (
     <motion.div
       layout
-      className="bg-primary/10 border rounded-xl p-4 shadow-sm shadow-primary/70"
+      className="bg-primary/5 hover:bg-primary/10 border border-primary/20 rounded-2xl p-4 shadow-sm transition-colors"
     >
       <div
-        className="flex justify-between items-center cursor-pointer"
-        onClick={() => setOpen(!open)}
+        className="flex justify-between items-center cursor-pointer gap-4 select-none"
+        onClick={onToggle}
       >
-        <p className="font-semibold text-gray-800">{q}</p>
+        <p className="font-semibold text-gray-800 text-base">{q}</p>
 
-        <span className="text-xl">
-          {open ? "−" : "+"}
+        <span className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-primary font-bold shadow-xs shrink-0 text-lg transition-transform">
+          {isOpen ? "−" : "+"}
         </span>
       </div>
 
-      {open && (
+      {isOpen && (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-3 bg-white p-3 rounded-lg border"
+          transition={{ duration: 0.2 }}
+          className="mt-3 bg-white p-4 rounded-xl border border-gray-100 shadow-xs"
         >
-          <p className="text-gray-700">{a}</p>
+          <p className="text-gray-700 text-sm leading-relaxed">{a}</p>
         </motion.div>
       )}
     </motion.div>

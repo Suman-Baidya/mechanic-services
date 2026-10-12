@@ -5,9 +5,9 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Phone, Wrench } from "lucide-react";
 
-// ==========================
-// CONFIG (Editable)
-// ==========================
+// -------------------------------------------------------------------
+// CONFIG
+// -------------------------------------------------------------------
 export const HERO_DATA = {
   services: [
     "Engine Repair",
@@ -17,15 +17,12 @@ export const HERO_DATA = {
     "Oil Change",
     "General Inspection",
   ],
-
   title: "Premium Mechanic Services Right at Your Doorstep",
   subtitle: "Instant help for vehicle repair, maintenance, and emergencies.",
-
   buttons: [
     { label: "Contact Now", icon: Phone, href: "#contact" },
     { label: "Our Services", icon: Wrench, href: "#services" },
   ],
-
   slides: [
     {
       image: "/heroImage_1.webp",
@@ -45,87 +42,95 @@ export const HERO_DATA = {
   ],
 };
 
+// -------------------------------------------------------------------
+// COMPONENT
+// -------------------------------------------------------------------
 export default function HeroSlider() {
   const [index, setIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // --------------------------------------------------------
-  // SLIDER CONTROLS
-  // --------------------------------------------------------
-  const next = useCallback(() => {
-    setIndex((prev) => (prev + 1) % HERO_DATA.slides.length);
-  }, []);
+  // run animations only after client mount to avoid hydration mismatch
+  useEffect(() => setMounted(true), []);
 
-  const prev = useCallback(() => {
-    setIndex((prev) => (prev - 1 + HERO_DATA.slides.length) % HERO_DATA.slides.length);
-  }, []);
+  const next = useCallback(
+    () => setIndex((i) => (i + 1) % HERO_DATA.slides.length),
+    []
+  );
+  const prev = useCallback(
+    () => setIndex((i) => (i - 1 + HERO_DATA.slides.length) % HERO_DATA.slides.length),
+    []
+  );
 
-  // Auto slide
+  // auto-slide
   useEffect(() => {
-    if (isPaused) return;
-
-    const timer = setInterval(() => next(), 5000);
+    if (!mounted || isPaused) return;
+    const timer = setInterval(next, 5000);
     return () => clearInterval(timer);
-  }, [isPaused, next]);
+  }, [isPaused, next, mounted]);
 
-  // --------------------------------------------------------
-  // SWIPE HANDLING
-  // --------------------------------------------------------
+  // swipe
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const minSwipe = 50;
 
-  const onTouchStart = (e: React.TouchEvent) => {
+  const onTouchStart = (e: React.TouchEvent) =>
     setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const onTouchMove = (e: React.TouchEvent) => {
+  const onTouchMove = (e: React.TouchEvent) =>
     setTouchEnd(e.targetTouches[0].clientX);
-  };
-
   const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-
-    const distance = touchStart - touchEnd;
-    if (distance > minSwipe) next();
-    if (distance < -minSwipe) prev();
-
+    if (touchStart === null || touchEnd === null) return;
+    const dist = touchStart - touchEnd;
+    if (dist > minSwipe) next();
+    if (dist < -minSwipe) prev();
     setTouchStart(null);
     setTouchEnd(null);
   };
 
-  // --------------------------------------------------------
+  // -------------------------------------------------------------------
   // RENDER
-  // --------------------------------------------------------
+  // -------------------------------------------------------------------
   return (
     <section id="home" className="relative w-full h-screen overflow-hidden pt-10">
-      {/* Background Slides */}
+      {/* Background slides */}
       <div className="absolute inset-0 overflow-hidden">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={index} // ensures safe hydration
-            className="absolute inset-0"
-            initial={{ scale: 1.2, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            transition={{ duration: 1 }}
-          >
-            <Image
-              src={HERO_DATA.slides[index].image}
-              alt="Hero Image"
-              fill
-              className="object-cover"
-              priority
-              sizes="100vw"
-            />
-          </motion.div>
-        </AnimatePresence>
+        {mounted ? (
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={index}
+              className="absolute inset-0"
+              initial={{ scale: 1.1, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ duration: 1 }}
+            >
+              <Image
+                src={HERO_DATA.slides[index].image}
+                alt="Hero Image"
+                fill
+                className="object-cover"
+                priority
+                sizes="100vw"
+              />
+            </motion.div>
+          </AnimatePresence>
+        ) : (
+          // static fallback rendered on server
+          <Image
+            src={HERO_DATA.slides[0].image}
+            alt="Hero Image"
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+          />
+        )}
       </div>
 
-      {/* Overlay */}
+      {/* overlay */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
 
-      {/* CONTENT */}
+      {/* content */}
       <div
         className="relative z-20 h-full flex flex-col md:flex-row items-center justify-center md:justify-between md:gap-10 md:px-20 text-white"
         onMouseEnter={() => setIsPaused(true)}
@@ -134,29 +139,41 @@ export default function HeroSlider() {
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        {/* LEFT CONTENT */}
+        {/* left */}
         <div className="max-w-2xl space-y-4 text-center md:text-left">
-          <motion.h1
-            key={HERO_DATA.slides[index].heading}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-4xl md:text-6xl font-bold"
-          >
-            {HERO_DATA.slides[index].heading}
-          </motion.h1>
+          {mounted ? (
+            <>
+              <motion.h1
+                key={HERO_DATA.slides[index].heading}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="text-4xl md:text-6xl font-bold"
+              >
+                {HERO_DATA.slides[index].heading}
+              </motion.h1>
+              <motion.p
+                key={HERO_DATA.slides[index].text}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="mt-4 text-lg md:text-xl max-w-xl"
+              >
+                {HERO_DATA.slides[index].text}
+              </motion.p>
+            </>
+          ) : (
+            <>
+              <h1 className="text-4xl md:text-6xl font-bold">
+                {HERO_DATA.slides[0].heading}
+              </h1>
+              <p className="mt-4 text-lg md:text-xl max-w-xl">
+                {HERO_DATA.slides[0].text}
+              </p>
+            </>
+          )}
 
-          <motion.p
-            key={HERO_DATA.slides[index].text}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mt-4 text-lg md:text-xl max-w-xl"
-          >
-            {HERO_DATA.slides[index].text}
-          </motion.p>
-
-          {/* CTA BUTTONS */}
+          {/* buttons */}
           <div className="mt-6 flex gap-4 justify-center md:justify-start">
             {HERO_DATA.buttons.map((btn, i) => (
               <a
@@ -170,82 +187,81 @@ export default function HeroSlider() {
           </div>
         </div>
 
-        {/* ------------------------------ */}
-        {/* ENQUIRY FORM */}
-        {/* ------------------------------ */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="mt-10 w-full max-w-lg p-6 bg-white/20 backdrop-blur-xl rounded-2xl border border-white/30 shadow-xl"
-        >
-          <h3 className="text-2xl font-semibold mb-4">Quick Enquiry</h3>
-
-          <form className="flex flex-col gap-4">
-            <input
-              type="text"
-              placeholder="Your Name"
-              className="p-3 rounded-lg bg-white/30 border border-white/50 text-white placeholder-white/80"
-            />
-
-            <input
-              type="number"
-              placeholder="Mobile Number"
-              className="p-3 rounded-lg bg-white/30 border border-white/50 text-white placeholder-white/80"
-            />
-
-            <input
-              type="text"
-              placeholder="Address"
-              className="p-3 rounded-lg bg-white/30 border border-white/50 text-white placeholder-white/80"
-            />
-
-            <select className="p-3 rounded-lg bg-white/30 border border-white/50 text-white">
-              <option className="text-black">Select Service</option>
-
-              {HERO_DATA.services.map((service, i) => (
-                <option key={i} className="text-black">
-                  {service}
-                </option>
-              ))}
-            </select>
-
-            <button className="mt-2 py-3 bg-primary rounded-lg text-white font-bold hover:bg-white hover:text-primary transition">
-              Submit Enquiry
-            </button>
-          </form>
-        </motion.div>
-      </div>
-
-      {/* ARROWS */}
-      <button
-        onClick={prev}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-30 text-white"
-      >
-        <ChevronLeft size={40} />
-      </button>
-
-      <button
-        onClick={next}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-30 text-white"
-      >
-        <ChevronRight size={40} />
-      </button>
-
-      {/* THUMBNAILS */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 hidden md:flex gap-3 z-30">
-        {HERO_DATA.slides.map((slide, i) => (
-          <button
-            key={i}
-            onClick={() => setIndex(i)}
-            className={`w-16 h-10 relative rounded-md overflow-hidden border ${
-              index === i ? "border-white" : "border-white/30"
-            }`}
+        {/* form */}
+        {mounted && (
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="mt-10 w-full max-w-lg p-6 bg-white/20 backdrop-blur-xl rounded-2xl border border-white/30 shadow-xl"
           >
-            <Image src={slide.image} alt="thumb" fill className="object-cover" />
-          </button>
-        ))}
+            <h3 className="text-2xl font-semibold mb-4">Quick Enquiry</h3>
+            <form className="flex flex-col gap-4">
+              <input
+                type="text"
+                placeholder="Your Name"
+                className="p-3 rounded-lg bg-white/30 border border-white/50 text-white placeholder-white/80"
+              />
+              <input
+                type="number"
+                placeholder="Mobile Number"
+                className="p-3 rounded-lg bg-white/30 border border-white/50 text-white placeholder-white/80"
+              />
+              <input
+                type="text"
+                placeholder="Address"
+                className="p-3 rounded-lg bg-white/30 border border-white/50 text-white placeholder-white/80"
+              />
+              <select className="p-3 rounded-lg bg-white/30 border border-white/50 text-white">
+                <option className="text-black">Select Service</option>
+                {HERO_DATA.services.map((s, i) => (
+                  <option key={i} className="text-black">
+                    {s}
+                  </option>
+                ))}
+              </select>
+              <button className="mt-2 py-3 bg-primary rounded-lg text-white font-bold hover:bg-white hover:text-primary transition">
+                Submit Enquiry
+              </button>
+            </form>
+          </motion.div>
+        )}
       </div>
+
+      {/* arrows */}
+      {mounted && (
+        <>
+          <button
+            onClick={prev}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-30 text-white"
+          >
+            <ChevronLeft size={40} />
+          </button>
+          <button
+            onClick={next}
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-30 text-white"
+          >
+            <ChevronRight size={40} />
+          </button>
+        </>
+      )}
+
+      {/* thumbnails */}
+      {mounted && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 hidden md:flex gap-3 z-30">
+          {HERO_DATA.slides.map((slide, i) => (
+            <button
+              key={i}
+              onClick={() => setIndex(i)}
+              className={`w-16 h-10 relative rounded-md overflow-hidden border ${
+                index === i ? "border-white" : "border-white/30"
+              }`}
+            >
+              <Image src={slide.image} alt="thumb" fill className="object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
     </section>
   );
 }
